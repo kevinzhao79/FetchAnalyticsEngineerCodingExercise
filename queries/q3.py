@@ -5,7 +5,7 @@
 # status to this was 'Finished', which I am accepting as a synonym of 'Accepted'. 
 
 import sqlite3
-con = sqlite3.connect('../database/fetch.db')
+con = sqlite3.connect('./database/fetch.db')
 cur = con.cursor()
 
 res = cur.execute("""
@@ -18,7 +18,7 @@ GROUP BY rewardsReceiptStatus
 
 """)
 
-print(res.fetchall()) 
+print("When considering average spend from receipts with 'rewardsReceiptStatus' of 'Accepted' or 'Rejected', which is greater?\n", res.fetchall(), '\n') 
 
 # Receipts with 'rewardsReceiptStatus' = 'Finished' have a greater average spend of 80.85, compared to 
 # receipts with 'rewardsReceiptStatus' = 'Rejected' with an average spend of 23.33.

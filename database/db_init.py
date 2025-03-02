@@ -76,7 +76,7 @@ cur.execute("""
 )""")
 
 cur.execute("SELECT name FROM sqlite_master WHERE type='table';")
-print(cur.fetchall())
+print('Tables:', [x[0] for x in cur.fetchall()], '\n')
 
 con.commit()
 con.close()

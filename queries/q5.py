@@ -6,7 +6,7 @@
 # which is 2021-02-12 14:11:06, and finding accounts within 6 months of this datetime.
 
 import sqlite3
-con = sqlite3.connect('../database/fetch.db')
+con = sqlite3.connect('./database/fetch.db')
 cur = con.cursor()
 
 six_months_in_unix = 2629743 * 6 # Approximately 6 months in seconds of UNIX time
@@ -40,4 +40,4 @@ LIMIT 5
     most_recent_created_account_date, six_months_in_unix
 ))
 
-print(res.fetchall())
+print('Which brand has the most spend among users who were created within the past 6 months?\n', res.fetchall(), '\n')

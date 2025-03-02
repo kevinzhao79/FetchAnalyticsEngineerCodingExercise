@@ -4,8 +4,10 @@
 # NOTE: The most recent receipt scanned from this dataset was March 1, 2021. To keep this query relevant, I will 
 # move "the most recent month" to be a month from March 1, 2021. 
 
+# NOTE: This query only returns 1 brand, due to Items and Brands having null brandCode values which prevents a complete JOIN. 
+
 import sqlite3
-con = sqlite3.connect('../database/fetch.db')
+con = sqlite3.connect('./database/fetch.db')
 cur = con.cursor()
 
 one_month_in_unix = 2629743 # Approximately 1 month in seconds of UNIX time
@@ -34,5 +36,5 @@ LIMIT 5
     most_recent_receipt_scanned, one_month_in_unix
 ))
 
-print(highest_selling.fetchall())
+print('What are the top 5 brands by receipts scanned for most recent month?\n', highest_selling.fetchall(), '\n')
 

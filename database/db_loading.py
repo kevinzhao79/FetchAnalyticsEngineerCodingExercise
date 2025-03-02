@@ -1,18 +1,16 @@
 # db_loading.py
 # This file will load the data from "brands.json", "receipts.json", and "users.json" into the fetch.db tables
 
-import sys
-from re import sub
 import json
-import os
-
 import sqlite3
+
 con = sqlite3.connect('./fetch.db')
 cur = con.cursor()
 
 items = []
 cpg = []
 
+# Turns each .json file into a List of JSON objects
 def jsonify(path):
 
     with open(path, 'r') as f:
@@ -24,12 +22,15 @@ def jsonify(path):
     return strings
 
 def load_receipts(receipts):
-    # Insert JSON data into Receipts table
+
     keys = ['bonusPointsEarned', 'bonusPointsEarnedReason', 'pointsEarned', 'purchasedItemCount', 'rewardsReceiptStatus', 'totalSpent', 'userId']
     
     for r in receipts:
+        
+        # Standard values that don't have nested values
         values = {key: r[key] if key in r else None for key in keys}
 
+        # Flatten nested values
         values['id'] = r['_id']['$oid']
         values['createDate'] = r['createDate']['$date'] if r.get('createDate') else None
         values['dateScanned'] = r['dateScanned']['$date'] if r.get('dateScanned') else None
@@ -38,6 +39,7 @@ def load_receipts(receipts):
         values['purchaseDate'] = r['purchaseDate']['$date'] if r.get('purchaseDate') else None
         values['pointsAwardedDate'] = r['pointsAwardedDate']['$date'] if r.get('pointsAwardedDate') else None
 
+        # Parameterized INSERT
         cur.execute("""
             INSERT INTO Receipts (
                 id, bonusPointsEarned, bonusPointsEarnedReason, createDate, dateScanned, finishedDate, modifyDate, 
@@ -58,10 +60,11 @@ def load_receipts(receipts):
                 item['receiptId'] = values['id']
                 items.append(item)
 
-    print(cur.execute('SELECT COUNT(*) FROM Receipts').fetchall())
+    print('Number of rows in Receipts:', cur.execute('SELECT COUNT(*) FROM Receipts').fetchall()[0][0])
 
 def load_items(items):
-    # Insert Item data gathered from Receipts.JSON into Items table
+
+    # New ID's for each Item, has Item has no inherent UUID
     id_counter = 0
     keys = ['id', 'barcode', 'brandCode', 'receiptId', 'description', 'finalPrice', 'pointsEarned', 'quantityPurchased', 'partnerItemId']
 
@@ -79,7 +82,7 @@ def load_items(items):
 
         id_counter += 1
 
-    print(cur.execute('SELECT COUNT(*) FROM Items').fetchall())
+    print('Number of rows in Items:', cur.execute('SELECT COUNT(*) FROM Items').fetchall()[0][0])
 
 def load_users(users):
 
@@ -92,6 +95,7 @@ def load_users(users):
         values['createdDate'] = u['createdDate']['$date'] if u.get('createdDate') else None
         values['lastLogin'] = u['lastLogin']['$date'] if u.get('lastLogin') else None
 
+        # Some duplicate rows exist, so only INSERT non-duplicate rows
         if len(cur.execute(f"SELECT * FROM Users WHERE id = '{values['id']}'").fetchall()) == 0:
             cur.execute("""
                 INSERT INTO Users (id, active, createdDate, lastLogin, role, signUpSource, state)
@@ -101,7 +105,7 @@ def load_users(users):
                 values['role'], values['signUpSource'], values['state']
             ))
 
-    print(cur.execute('SELECT COUNT(*) FROM Users').fetchall())
+    print('Number of rows in Users:', cur.execute('SELECT COUNT(*) FROM Users').fetchall()[0][0])
 
 def load_brands(brands):
 
@@ -122,26 +126,24 @@ def load_brands(brands):
 
         cpg.append({'id' : values['cpgId'], 'ref' : values['cpgRef']})
 
-    print(cur.execute('SELECT COUNT(*) FROM Brands').fetchall())
+    print('Number of rows in Brands:', cur.execute('SELECT COUNT(*) FROM Brands').fetchall()[0][0])
 
 def load_cpg(cpg):
     
     for c in cpg:
-        id = c['id']
 
-        # If a CPG with the same ID hasn't been inserted yet, then insert it
-        if len(cur.execute(f"SELECT * FROM CPG WHERE id = '{id}'").fetchall()) == 0:
+        if len(cur.execute(f"SELECT * FROM CPG WHERE id = '{c['id']}'").fetchall()) == 0:
             cur.execute("""
                 INSERT INTO CPG (id, ref) VALUES (?, ?)
             """, (
                 c['id'], c['ref']
             ))
 
-    print(cur.execute('SELECT COUNT(*) FROM CPG').fetchall())
+    print('Number of rows in CPG:', cur.execute('SELECT COUNT(*) FROM CPG').fetchall()[0][0], '\n')
 
-receipts_path = '../data/receipts.json'
-users_path = '../data/users.json'
-brands_path = '../data/brands.json'
+receipts_path = './data/receipts.json'
+users_path = './data/users.json'
+brands_path = './data/brands.json'
 
 receipts = jsonify(receipts_path)
 users = jsonify(users_path)

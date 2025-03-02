@@ -35,7 +35,7 @@ from json import loads
 
 # Import Receipts data
 receipt_data = []
-with open('../data/receipts.json', 'r') as f:
+with open('./data/receipts.json', 'r') as f:
     for line in f:
         receipt_data.append(loads(line))
 
@@ -45,11 +45,11 @@ receipts_df = pd.DataFrame(receipt_data)
 # Check how many rows have a NULL value for 'totalSpent'
 total_spent_null_count = receipts_df['totalSpent'].isnull().sum()
 total_spent_total_count = receipts_df['totalSpent'].shape[0]
-print(f'Rows where Receipts.totalSpent is null: {total_spent_null_count} out of {total_spent_total_count}', '\n')
+print(f'Rows where Receipts.totalSpent is null: {total_spent_null_count} out of {total_spent_total_count}')
 
 # Import Users data
 users_data = []
-with open('../data/users.json', 'r') as f:
+with open('./data/users.json', 'r') as f:
     for line in f:
         users_data.append(loads(line))
 
@@ -82,8 +82,8 @@ iqr = q3 - q1
 lower_bound, upper_bound = q1 - 1.5 * iqr, q3 + 1.5 * iqr
 
 outliers = total_spent_df[(total_spent_df['totalSpent'] < lower_bound) | (total_spent_df['totalSpent'] > upper_bound)]
-print('Summary for Receipts.totalSpent:', total_spent_summary, '\n')
-print(f'{outliers.count().item()} outliers out of {total_spent_df["totalSpent"].count()} in Receipts.totalSpent', '\n\n')
+print('Summary for Receipts.totalSpent:\n', total_spent_summary)
+print(f'{outliers.count().item()} outliers out of {total_spent_df["totalSpent"].count()}', '\n')
 
 
 ###### Find summary for values in Items.finalPrice, and check for outliers/negative values ######
@@ -105,5 +105,5 @@ iqr = q3 - q1
 lower_bound, upper_bound = q1 - 1.5 * iqr, q3 + 1.5 * iqr
 
 outliers = final_price_df[(final_price_df['finalPrice'] < lower_bound) | (final_price_df['finalPrice'] > upper_bound)]
-print('Summary for Receipts.totalSpent:', final_price_summary, '\n')
-print(f'{outliers.count().item()} outliers out of {final_price_df["finalPrice"].count()} in Items.finalPrice', '\n\n')
+print('Summary for Receipts.totalSpent:\n', final_price_summary)
+print(f'{outliers.count().item()} outliers out of {final_price_df["finalPrice"].count()}', '\n')
