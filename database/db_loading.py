@@ -109,10 +109,11 @@ def load_users(users):
 
 def load_brands(brands):
 
-    keys = ['id', 'name', 'barcode', 'brandCode', 'category', 'categoryCode', 'topBrand']
+    keys = ['name', 'barcode', 'brandCode', 'category', 'categoryCode', 'topBrand']
 
     for b in brands:
         values = {key : b[key] if key in b else None for key in keys}
+        values['id'] = b['_id']['$oid']
         values['cpgId'] = b['cpg']['$id']['$oid']
         values['cpgRef'] = b['cpg']['$ref']
 
