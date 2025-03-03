@@ -12,25 +12,25 @@ cur = con.cursor()
 
 one_month_in_unix = 2629743 # Approximately 1 month in seconds of UNIX time
 most_recent_receipt_scanned = cur.execute("""
-    SELECT strftime('%s', dateScanned) 
+    SELECT strftime('%s', dateScanned)
     FROM Receipts 
     ORDER BY dateScanned DESC 
     LIMIT 1
 """).fetchone()[0]
 
-highest_selling = cur.execute(f"""
+highest_selling = cur.execute("""
 WITH temp AS (
-    SELECT i.brandCode, SUM(i.finalPrice) AS total
+    SELECT r.id, i.brandCode, COUNT(*) AS itemCount
     FROM Receipts r JOIN Items i
     ON r.id = i.receiptId
     WHERE unixepoch(r.dateScanned) >= ? - ?
-    GROUP BY i.brandCode
+    GROUP BY r.id, i.brandCode
 )
-SELECT b.name AS Brand, SUM(temp.total) AS MonthSales
+SELECT b.name AS Brand, SUM(temp.itemCount > 0) AS NumReceipts
 FROM Brands b JOIN temp
 ON b.brandCode = temp.brandCode
 GROUP BY b.name
-ORDER BY MonthSales DESC
+ORDER BY NumReceipts DESC
 LIMIT 5
 """, (
     most_recent_receipt_scanned, one_month_in_unix

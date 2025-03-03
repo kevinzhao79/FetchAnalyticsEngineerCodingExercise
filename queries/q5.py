@@ -35,7 +35,7 @@ FROM Brands b JOIN temp ON
 b.brandCode = temp.brandCode
 GROUP BY b.name
 ORDER BY TotalSales DESC
-LIMIT 5
+LIMIT 1
 """, (
     most_recent_created_account_date, six_months_in_unix
 ))

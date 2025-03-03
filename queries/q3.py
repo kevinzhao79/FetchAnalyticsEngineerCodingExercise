@@ -9,13 +9,12 @@ con = sqlite3.connect('./database/fetch.db')
 cur = con.cursor()
 
 res = cur.execute("""
-SELECT rewardsReceiptStatus, AVG(totalSpent)
+SELECT rewardsReceiptStatus, ROUND(AVG(totalSpent), 2)
 FROM Receipts
 WHERE rewardsReceiptStatus = 'REJECTED'
 OR rewardsReceiptStatus = 'FINISHED'
 AND totalSpent NOT NULL
 GROUP BY rewardsReceiptStatus
-
 """)
 
 print("When considering average spend from receipts with 'rewardsReceiptStatus' of 'Accepted' or 'Rejected', which is greater?\n", res.fetchall(), '\n') 
